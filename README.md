@@ -25,3 +25,20 @@ Example of a valid file contents:
 07 17 00 52 68  
 15 30 41 50 61  
 09 21 45 49 67  
+
+To run:
+Take the LINUX file and make it executable.  
+In the same directory, have a file that has contents that meet the reqirements above.  
+
+On the terminal, run the program by running ./LINUX [Your file]  
+
+If everything works, you should have a screen that looks like this:  
+
+CALL LIST:  
+ L   I   N   U   X  
+01  25  40  59  75  
+04  19  34  46  70  
+07  17  00m 52  68  
+15  30  41  50  61  
+09  21  45  49  67  
+Enter any character to continue, or q to quit:  
