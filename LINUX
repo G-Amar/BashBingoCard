@@ -1,0 +1,199 @@
+#!/bin/bash
+#source: LINUX
+
+check_nums()
+{
+if [ ${card[2,2]} -ne "00" ] ; then
+  return 1
+fi
+#this checks if all numbers in the column are in the range
+for((x=0 ; x<5 ; x++))
+do
+  local min="$((15*$x + 1))"
+  local max="$((15*$(($x + 1))))"
+
+  for((y=0 ; y<5 ; y++))
+  do
+    if [ "$x" = "2" -a "$y" = "2" ] ; then
+      continue
+    elif [ "${card[$y,$x]}" -lt "$min" -o "${card[$y,$x]}" -gt "$max" ] ; then
+      return 1
+    fi
+  done
+done
+#the following if statement checks that all entries per column are unique
+for((i=1 ; i<=5 ; i++))
+do
+  local col="`cut -d ' ' -f${i} <<< \"$matrix\"`"
+  if [ "`wc -l <<<\"$col\"`" \
+       != "`sort <<<\"$col\" | uniq | wc -l`" ] ; then
+    return 1
+  fi
+done
+return 0
+}
+print_game()
+{
+clear
+echo "CALL LIST: ${calls[*]}"
+printf " L   I   N   U   X \n"
+
+for((x=0 ; x<5 ; x++))
+do
+  for((y=0 ; y<5 ; y++))
+  do
+    printf "${card[$x,$y]} "
+  done
+  printf "\n"
+done
+}
+generate_call()
+{
+local num=$((1 + $RANDOM % 75))
+for number in ${nums[*]}
+do
+  if [ "$num" = "$number" ] ; then
+    return 1
+  fi
+done
+nums[$index]=$num
+if [ "$num" -ge "1" -a "$num" -le "15"  ] ; then
+  if [ "$num" -ge "1" -a "$num" -le "9"  ] ; then
+    calls[$index]="L0$num"
+  else
+    calls[$index]="L$num"
+  fi
+elif [ "$num" -ge "16" -a "$num" -le "30"  ] ; then
+  calls[$index]="I$num"
+elif [ "$num" -ge "31" -a "$num" -le "45"  ] ; then
+  calls[$index]="N$num"
+elif [ "$num" -ge "46" -a "$num" -le "60"  ] ; then
+  calls[$index]="U$num"
+else
+  calls[$index]="X$num"
+fi
+index=index+1
+#errors are sent to /dev/null as it will be comparing marked entries (strings)
+#with integers and will produce error message
+for((x=0 ; x<5 ; x++))
+do
+  for((y=0 ; y<5 ; y++))
+  do
+    if [ "${card[$x,$y]}" -eq "$num" 2>/dev/null ] ; then
+      card[$x,$y]="`tr ' ' 'm' <<<\"${card[$x,$y]}\"`"
+      break
+    fi
+  done
+done
+
+return 0
+}
+check_win()
+{
+for((x=0 ; x<5 ; x++)) #checks rows
+do
+  local flag="t"
+  for((y=0 ; y<5 ; y++))
+  do
+    if [ ! "`grep 'm' <<<\"${card[$x,$y]}\"`" ] ; then
+      flag=""
+    fi
+  done
+  if [ "$flag" ] ; then
+    return 0
+  fi
+done
+
+for((x=0 ; x<5 ; x++)) #checks cols
+do
+  local flag="t"
+  for((y=0 ; y<5 ; y++))
+  do
+    if [ ! "`grep 'm' <<<\"${card[$y,$x]}\"`" ] ; then
+      flag=""
+    fi
+  done
+  if [ "$flag" ] ; then
+    return 0
+  fi
+done
+
+local flag="t"
+for corner in ${card[0,0]} ${card[0,4]} ${card[4,0]} ${card[4,4]}
+do
+  if [ ! "`grep 'm' <<<\"${corner}\"`" ] ; then
+    flag=""
+  fi
+done
+if [ "$flag" ] ; then
+  return 0
+fi
+
+return 1
+}
+
+if [ ! -e "$1" -o ! -r "$1" ] ; then
+  echo "input file missing or unreadable" >/dev/stderr
+  exit 1
+fi
+if [ "`wc -l $1 | cut -d ' ' -f1`" != "6" ] ; then
+  echo "input file must have 6 lines" >/dev/stderr
+  exit 2
+fi
+if [ ! "`head -1 $1 | grep '^[0-9][0-9]*$'`" ] ; then
+  echo "seed line format error" >/dev/stderr
+  exit 3
+fi
+#this makes sure the matrix follow proper format of nums and space
+if [ "`grep -c '^[0-9][0-9] [0-9][0-9] [0-9][0-9] [0-9][0-9] [0-9][0-9]$' $1`"\
+     != "5" ] ; then
+  echo "card format error" >/dev/stderr
+  exit 4
+fi
+
+typeset seed="`head -1 $1`"
+
+typeset matrix="`tail -n+2 $1`"
+
+typeset -A card
+for((x=0 ; x<5 ; x++))
+do
+  for((y=0 ; y<5 ; y++))
+  do
+    card[$x,$y]="`cut -d ' ' -f$((5*$x + $y + 1)) <<<$matrix` "
+  done
+done
+
+check_nums
+if [ "$?" = "1"  ] ; then
+  echo "card format error" >/dev/stderr
+  exit 4
+fi
+
+card[2,2]="`tr ' ' 'm' <<<\"${card[2,2]}\"`"
+RANDOM=$seed
+typeset -a calls
+typeset -a nums
+typeset -i index=0
+
+while [ "true" ]
+do
+  print_game
+  printf "Enter any character to continue, or q to quit: "
+  read -n1 input
+  if [ "$input" = "q" ] ; then
+    printf “\n”
+    exit 0
+  fi
+  generate_call
+  while [ "$?" = "1" ]
+  do
+    generate_call
+  done
+  check_win
+  if [ "$?" = "0" ] ; then
+    print_game
+    echo "WINNER"
+    exit 0
+  fi
+done
