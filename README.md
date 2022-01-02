@@ -12,12 +12,12 @@ The bingo card must have the following format:
 - column 4 contains 5 unique integers in [46-60]
 - column 5 contains 5 unique integers in [61-75]
 Card numbers must have exactly 2 digits, and be separated by one space,
-with no extraneous whitespace, not even at the start or end of a line.
+with no extraneous whitespace, not even at the start or end of a line.  
 All card number MUST be unique as well, no duplicates.
 
 The card can have no extra lines, else it wil throw an error.
 
-Example of a valid file contents:
+Example of a valid file contents:  
 168  
 01 25 40 59 75  
 04 19 34 46 70  
