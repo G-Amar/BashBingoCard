@@ -18,9 +18,9 @@ All card number MUST be unique as well, no duplicates.
 The card can have no extra lines, else it wil throw an error.
 
 Example of a valid file contents:
-168
-01 25 40 59 75
-04 19 34 46 70
-07 17 00 52 68
-15 30 41 50 61
-09 21 45 49 67
+168  
+01 25 40 59 75  
+04 19 34 46 70  
+07 17 00 52 68  
+15 30 41 50 61  
+09 21 45 49 67  
