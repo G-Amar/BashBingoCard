@@ -32,7 +32,7 @@ In the same directory, have a file that has contents that meet the reqirements a
 
 On the terminal, run the program by running ./LINUX [Your file]  
 
-If everything works, you should have a screen that looks like this:  
+If everything works, you should have a screen that looks like this (check the raw to be able to see the proper formating of the game below):  
 
 CALL LIST:  
  L   I   N   U   X  
