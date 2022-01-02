@@ -10,7 +10,7 @@ The bingo card must have the following format:
 - column 2 contains 5 unique integers in [16-30]
 - column 3 contains 4 unique integers in [31-45] plus middle integer 00
 - column 4 contains 5 unique integers in [46-60]
-- column 5 contains 5 unique integers in [61-75]
+- column 5 contains 5 unique integers in [61-75]  
 Card numbers must have exactly 2 digits, and be separated by one space,
 with no extraneous whitespace, not even at the start or end of a line.  
 All card number MUST be unique as well, no duplicates.
